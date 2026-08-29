@@ -56,11 +56,18 @@ builder.Services
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
-builder.Services.AddHttpClient<IOutageSource, PollOutageSource>((provider, client) =>
+if (string.Equals(builder.Configuration["OutageFeed:Source"], "Live", StringComparison.OrdinalIgnoreCase))
 {
-    var options = provider.GetRequiredService<IOptions<OutageFeedOptions>>().Value;
-    client.BaseAddress = options.Url;
-});
+    builder.Services.AddHttpClient<IOutageSource, PollOutageSource>((provider, client) =>
+    {
+        var options = provider.GetRequiredService<IOptions<OutageFeedOptions>>().Value;
+        client.BaseAddress = options.Url;
+    });
+}
+else
+{
+    builder.Services.AddSingleton<IOutageSource, FixtureOutageService>();
+}
 
 builder.Services.AddHostedService<OutagePoller>();
 builder.Services.AddSignalR();
