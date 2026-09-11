@@ -7,9 +7,12 @@ type StatusPillProps = {
     lastUpdatedAt: number | null;
 };
 
+const IS_DEMO_MODE =
+    import.meta.env.VITE_DEMO_MODE === 'true';
+
 const LABELS: Record<ConnectionState, string> = {
     connecting: 'Connecting',
-    live: 'Live',
+    live: IS_DEMO_MODE ? 'Demo' : 'Live',
     reconnecting: 'Reconnecting',
     offline: 'Offline'
 };
