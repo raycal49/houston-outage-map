@@ -66,10 +66,11 @@ if (string.Equals(builder.Configuration["OutageFeed:Source"], "Live", StringComp
 }
 else
 {
-    builder.Services.AddSingleton<IOutageSource, FixtureOutageService>();
+    builder.Services.AddSingleton<IOutageSource, DemoSource>();
 }
 
 builder.Services.AddHostedService<OutagePoller>();
+builder.Services.AddTransient<OutagePollOperation>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<OutageSyncService>();
 builder.Services.AddScoped<IOutageReader, OutageReader>();

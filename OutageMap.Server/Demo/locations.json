@@ -1,0 +1,242 @@
+[
+  {
+    "latitude": 29.64404,
+    "longitude": -95.30792,
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "SOUTH HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77061"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.68874,
+    "longitude": -95.39423,
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "BELLAIRE"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77054"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.73612,
+    "longitude": -95.47024,
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "BELLAIRE"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77056"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.79631,
+    "longitude": -95.55513,
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "SPRING BRANCH"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77043"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.88321,
+    "longitude": -95.56609,
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "GREENSPOINT"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77040"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.91787,
+    "longitude": -95.33404,
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "HUMBLE"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77039"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.98644,
+    "longitude": -95.59042,
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "CYPRESS"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77070"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 30.01296,
+    "longitude": -95.47401,
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "GREENSPOINT"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77068"
+        ]
+      }
+    ]
+  }
+]

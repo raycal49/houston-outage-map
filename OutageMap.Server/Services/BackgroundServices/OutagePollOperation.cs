@@ -1,0 +1,57 @@
+﻿using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Options;
+using OutageMap.Server.Hubs;
+using OutageMap.Server.Infrastructure.Http;
+using OutageMap.Server.Services;
+
+namespace Services.BackgroundServices;
+
+public class OutagePollOperation
+{
+    private readonly TimeSpan _period;
+    private readonly ILogger<OutagePoller> _logger;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IHubContext<OutageHub> _hub;
+
+    public OutagePollOperation(IOptions<OutageFeedOptions> feedOptions, ILogger<OutagePoller> logger, IServiceProvider service, IHubContext<OutageHub> hub)
+    {
+        _period = feedOptions.Value.PollInterval;
+        _logger = logger;
+        _serviceProvider = service;
+        _hub = hub;
+    }
+
+    private async Task PollAsync(int timesPolled, CancellationToken stoppingToken)
+    {
+        try
+        {
+            using IServiceScope scope = _serviceProvider.CreateScope();
+
+            IOutageSource source =
+                scope.ServiceProvider
+                    .GetRequiredService<IOutageSource>();
+
+            var outages = await source.GetOutageData();
+
+            OutageValidator.Validate(outages);
+
+            OutageSyncService syncService = scope.ServiceProvider.GetRequiredService<OutageSyncService>();
+
+            OutageSyncResult result = await syncService.SyncStoredOutages(outages, stoppingToken);
+
+            _logger.LogInformation(
+                "Poll #{TimesPolled}. Added: {Added}, Updated: {Updated}, Deactivated: {Deactivated}",
+                timesPolled,
+                result.Added,
+                result.Updated,
+                result.Deactivated);
+
+            if (result.HasChanges)
+                await _hub.Clients.All.SendAsync("OutagesChanged", cancellationToken: stoppingToken);
+        }
+        catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
+        {
+            _logger.LogError(ex, "Outage poll #{TimesPolled} failed.", timesPolled);
+        }
+    }
+}

@@ -2,7 +2,6 @@ const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
-/** Coarse duration: "45m", "2h 15m", "1d 3h". Always two units at most. */
 export function formatDuration(ms: number): string {
     const total = Math.max(0, ms);
 
@@ -19,13 +18,6 @@ export function formatDuration(ms: number): string {
     return `${days}d ${Math.round((total % DAY) / HOUR)}h`;
 }
 
-/*
- * Compact elapsed time for the connection pill: "8s", "4m", "1h 12m".
- *
- * Deliberately not formatDuration: this one has a seconds tier and no days tier,
- * because a feed that has been quiet for a day is a different problem than a
- * label can express, whereas seconds matter right after an update lands.
- */
 export function formatAge(elapsedMs: number): string {
     const seconds = Math.max(0, Math.floor(elapsedMs / 1000));
 
@@ -35,18 +27,11 @@ export function formatAge(elapsedMs: number): string {
 
     if (minutes < 60) return `${minutes}m`;
 
-    const hours = Math.floor(minutes / 60);
+    const hours = Math.round(minutes / 60);
 
     return `${hours}h ${minutes % 60}m`;
 }
 
-/**
- * Time remaining until estimated restoration.
- *
- * 7 of 102 records in a representative feed snapshot carry no etrTime at all,
- * so the null case is the normal case, not an error - it must read as a real
- * state rather than as a broken date.
- */
 export function formatRelativeEtr(etrMs: number | null | undefined, now: number = Date.now()): string {
     if (typeof etrMs !== 'number' || !Number.isFinite(etrMs))
         return 'Not yet estimated';
@@ -56,7 +41,6 @@ export function formatRelativeEtr(etrMs: number | null | undefined, now: number 
     return remaining <= 0 ? 'Overdue' : formatDuration(remaining);
 }
 
-/** How long an outage has been running. */
 export function formatOutageAge(startMs: number | null | undefined, now: number = Date.now()): string | null {
     if (typeof startMs !== 'number' || !Number.isFinite(startMs))
         return null;
@@ -64,10 +48,6 @@ export function formatOutageAge(startMs: number | null | undefined, now: number 
     return formatDuration(now - startMs);
 }
 
-/**
- * The feed sends place names in caps ("HOUSTON", "SPRING BRANCH"). Rendering
- * them raw makes the popup shout, so normalise to title case.
- */
 export function toTitleCase(value: string | null | undefined): string | null {
     if (!value) return null;
 
