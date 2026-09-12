@@ -7,6 +7,7 @@ using OutageMap.Server.Models;
 using OutageMap.Server.Services;
 using Services.BackgroundServices;
 using System.Text.Json.Serialization;
+using OutageMap.Server.Demo;
 
 var opts = new WebApplicationOptions
 {
@@ -74,6 +75,7 @@ builder.Services.AddTransient<OutagePollOperation>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<OutageSyncService>();
 builder.Services.AddScoped<IOutageReader, OutageReader>();
+builder.Services.AddSingleton<OutageSimulator>();
 
 var app = builder.Build();
 
