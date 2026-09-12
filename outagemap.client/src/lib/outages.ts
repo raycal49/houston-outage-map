@@ -37,18 +37,18 @@ export function featuresWithNewIds(fc: OutageCollection, previousIds: Set<number
 }
 
 export const STATUS_COLORS: Record<string, string> = {
-    'Pending Assessment': '#f5a524',
-    'Crew Assessing': '#56b4e9',
-    'Planned Outage': '#00c896',
-    'Further Assessment Needed': '#e879b9'
+    'Pending Assessment': '#E69F00',
+    'Crew Assessing': '#56B4E9',
+    'Further Assessment Needed': '#CC79A7',
+    'Planned Outage': '#009E73'
 };
 
 export const UNKNOWN_STATUS_COLOR = '#94a3b8';
 
 export const STATUS_ORDER = [
     'Pending Assessment',
-    'Further Assessment Needed',
     'Crew Assessing',
+    'Further Assessment Needed',
     'Planned Outage'
 ];
 

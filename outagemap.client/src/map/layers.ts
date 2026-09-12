@@ -19,7 +19,6 @@ const SMALLEST_CLUSTER_PX = 14;
 const LARGEST_CLUSTER_PX = 30;
 
 const HALO_PADDING_PX = 5;
-const CLUSTER_RING_PADDING_PX = 4;
 
 const CUSTOMER_STOPS = [1, 5, 10, 25, 50, 100, 250, 500, 1000];
 
@@ -43,10 +42,6 @@ function clusterRadiusOf(customers: number): number {
     return radiusForCustomers(customers, SMALLEST_CLUSTER_PX, LARGEST_CLUSTER_PX);
 }
 
-function clusterRingRadiusOf(customers: number): number {
-    return clusterRadiusOf(customers) + CLUSTER_RING_PADDING_PX;
-}
-
 function stopsFrom(radiusOf: (customers: number) => number): number[] {
     return CUSTOMER_STOPS.flatMap(customers => [customers, radiusOf(customers)]);
 }
@@ -64,7 +59,6 @@ function radiusExpression(
 const pointRadius = radiusExpression(pointCustomers, pointRadiusOf);
 const haloRadius = radiusExpression(pointCustomers, haloRadiusOf);
 const clusterRadius = radiusExpression(clusterCustomers, clusterRadiusOf);
-const clusterRingRadius = radiusExpression(clusterCustomers, clusterRingRadiusOf);
 const clusterLabel: ExpressionSpecification = ["get", "point_count_abbreviated"];
 
 const STATUS_COLOR_EXPRESSION: ExpressionSpecification = [
@@ -77,20 +71,6 @@ const STATUS_COLOR_EXPRESSION: ExpressionSpecification = [
     UNKNOWN_STATUS_COLOR
 ];
 
-export const clusterHaloLayer = {
-    id: "outage-cluster-halos",
-    type: "circle",
-    filter: ["has", "point_count"],
-    paint: {
-        "circle-emissive-strength": 1,
-        "circle-radius": clusterRingRadius,
-        "circle-color": "rgba(0, 0, 0, 0)",
-        "circle-stroke-width": 2,
-        "circle-stroke-color": "rgba(226, 232, 240, 0.20)",
-        "circle-radius-transition": { duration: 220 }
-    }
-} satisfies LayerProps;
-
 export const clusterLayer = {
     id: "outage-clusters",
     type: "circle",
@@ -98,9 +78,9 @@ export const clusterLayer = {
     paint: {
         "circle-emissive-strength": 1,
         "circle-radius": clusterRadius,
-        "circle-color": "rgba(15, 17, 23, 0.94)",
-        "circle-stroke-width": 1.25,
-        "circle-stroke-color": "rgba(248, 250, 252, 0.72)",
+        "circle-color": "rgba(203, 213, 225, 0.95)",
+        "circle-stroke-width": 1,
+        "circle-stroke-color": "rgba(4, 7, 12, 0.88)",
         "circle-radius-transition": { duration: 220 }
     }
 } satisfies LayerProps;
@@ -115,7 +95,7 @@ export const clusterCountLayer = {
         "text-size": 12,
         "text-allow-overlap": true
     },
-    paint: { "text-color": "rgba(248, 250, 252, 0.96)" }
+    paint: { "text-color": "rgba(8, 10, 14, 0.92)" }
 } satisfies LayerProps;
 
 export const outageHaloLayer = {
