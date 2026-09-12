@@ -1,3 +1,5 @@
+// outagemap.client/src/map/layers.ts
+
 import type { LayerProps } from 'react-map-gl/mapbox';
 import type { ExpressionSpecification } from 'mapbox-gl';
 import { STATUS_COLORS, UNKNOWN_STATUS_COLOR } from '@/lib/outages';
@@ -5,30 +7,65 @@ import { STATUS_COLORS, UNKNOWN_STATUS_COLOR } from '@/lib/outages';
 export const ARRIVAL_RADIUS_FROM = 6;
 export const ARRIVAL_RADIUS_TO = 40;
 
-export const CLUSTER_MAX_ZOOM = 9;
-export const CLUSTER_RADIUS = 50;
-export const CLUSTER_MIN_POINTS = 3;
+export const CLUSTER_MAX_ZOOM = 11;
+export const CLUSTER_RADIUS = 44;
+export const CLUSTER_MIN_POINTS = 2;
 
-const POINT_RADIUS_MIN = 5;
-const POINT_RADIUS_MAX = 13;
-const HALO_RADIUS_MIN = 12;
-const HALO_RADIUS_MAX = 32;
+const SIZE_FACTOR = 2.15;
 
-const CUSTOMERS_MIN = 1;
-const CUSTOMERS_MAX = 80;
+const SMALLEST_POINT_PX = 5;
+const LARGEST_POINT_PX = 18;
+const SMALLEST_CLUSTER_PX = 14;
+const LARGEST_CLUSTER_PX = 30;
 
-const CUSTOMER_SCALE_MIN = Math.sqrt(CUSTOMERS_MIN);
-const CUSTOMER_SCALE_MAX = Math.sqrt(CUSTOMERS_MAX);
+const HALO_PADDING_PX = 5;
+const CLUSTER_RING_PADDING_PX = 4;
 
-function scaleByCustomers(minRadius: number, maxRadius: number): ExpressionSpecification {
-    return [
-        "interpolate",
-        ["linear"],
-        ["sqrt", ["coalesce", ["get", "numPeople"], CUSTOMERS_MIN]],
-        CUSTOMER_SCALE_MIN, minRadius,
-        CUSTOMER_SCALE_MAX, maxRadius
-    ];
+const CUSTOMER_STOPS = [1, 5, 10, 25, 50, 100, 250, 500, 1000];
+
+function clamp(value: number, smallest: number, largest: number): number {
+    return Math.min(largest, Math.max(smallest, value));
 }
+
+function radiusForCustomers(customers: number, smallestPx: number, largestPx: number): number {
+    return clamp(SIZE_FACTOR * Math.sqrt(customers), smallestPx, largestPx);
+}
+
+function pointRadiusOf(customers: number): number {
+    return radiusForCustomers(customers, SMALLEST_POINT_PX, LARGEST_POINT_PX);
+}
+
+function haloRadiusOf(customers: number): number {
+    return pointRadiusOf(customers) + HALO_PADDING_PX;
+}
+
+function clusterRadiusOf(customers: number): number {
+    return radiusForCustomers(customers, SMALLEST_CLUSTER_PX, LARGEST_CLUSTER_PX);
+}
+
+function clusterRingRadiusOf(customers: number): number {
+    return clusterRadiusOf(customers) + CLUSTER_RING_PADDING_PX;
+}
+
+function stopsFrom(radiusOf: (customers: number) => number): number[] {
+    return CUSTOMER_STOPS.flatMap(customers => [customers, radiusOf(customers)]);
+}
+
+const pointCustomers: ExpressionSpecification = ["coalesce", ["get", "numPeople"], 1];
+const clusterCustomers: ExpressionSpecification = ["coalesce", ["get", "customers"], 1];
+
+function radiusExpression(
+    customers: ExpressionSpecification,
+    radiusOf: (customers: number) => number
+): ExpressionSpecification {
+    return ["interpolate", ["linear"], customers, ...stopsFrom(radiusOf)] as ExpressionSpecification;
+}
+
+const pointRadius = radiusExpression(pointCustomers, pointRadiusOf);
+const haloRadius = radiusExpression(pointCustomers, haloRadiusOf);
+const clusterRadius = radiusExpression(clusterCustomers, clusterRadiusOf);
+const clusterRingRadius = radiusExpression(clusterCustomers, clusterRingRadiusOf);
+const clusterLabel: ExpressionSpecification = ["get", "point_count_abbreviated"];
 
 const STATUS_COLOR_EXPRESSION: ExpressionSpecification = [
     "match",
@@ -46,10 +83,11 @@ export const clusterHaloLayer = {
     filter: ["has", "point_count"],
     paint: {
         "circle-emissive-strength": 1,
-        "circle-radius": ["interpolate", ["linear"], ["get", "point_count"], 3, 20, 10, 25, 30, 32],
-        "circle-color": "#e2e8f0",
-        "circle-opacity": 0.13,
-        "circle-blur": 0.8
+        "circle-radius": clusterRingRadius,
+        "circle-color": "rgba(0, 0, 0, 0)",
+        "circle-stroke-width": 2,
+        "circle-stroke-color": "rgba(226, 232, 240, 0.20)",
+        "circle-radius-transition": { duration: 220 }
     }
 } satisfies LayerProps;
 
@@ -59,11 +97,11 @@ export const clusterLayer = {
     filter: ["has", "point_count"],
     paint: {
         "circle-emissive-strength": 1,
-        "circle-color": "rgba(18, 17, 20, 0.90)",
-        "circle-stroke-width": 1,
-        "circle-stroke-color": "rgba(255, 255, 255, 0.28)",
-        "circle-radius": ["interpolate", ["linear"], ["get", "point_count"], 3, 14, 10, 18, 30, 24],
-        "circle-radius-transition": { duration: 300 }
+        "circle-radius": clusterRadius,
+        "circle-color": "rgba(15, 17, 23, 0.94)",
+        "circle-stroke-width": 1.25,
+        "circle-stroke-color": "rgba(248, 250, 252, 0.72)",
+        "circle-radius-transition": { duration: 220 }
     }
 } satisfies LayerProps;
 
@@ -72,11 +110,12 @@ export const clusterCountLayer = {
     type: "symbol",
     filter: ["has", "point_count"],
     layout: {
-        "text-field": ["get", "point_count_abbreviated"],
+        "text-field": clusterLabel,
         "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-        "text-size": 11
+        "text-size": 12,
+        "text-allow-overlap": true
     },
-    paint: { "text-color": "rgba(255, 255, 255, 0.90)" }
+    paint: { "text-color": "rgba(248, 250, 252, 0.96)" }
 } satisfies LayerProps;
 
 export const outageHaloLayer = {
@@ -85,10 +124,10 @@ export const outageHaloLayer = {
     filter: ["!", ["has", "point_count"]],
     paint: {
         "circle-emissive-strength": 1,
-        "circle-radius": scaleByCustomers(HALO_RADIUS_MIN, HALO_RADIUS_MAX),
+        "circle-radius": haloRadius,
         "circle-color": STATUS_COLOR_EXPRESSION,
-        "circle-opacity": 0.3,
-        "circle-blur": 1
+        "circle-opacity": 0.16,
+        "circle-blur": 0.55
     }
 } satisfies LayerProps;
 
@@ -98,11 +137,12 @@ export const outageLayer = {
     filter: ["!", ["has", "point_count"]],
     paint: {
         "circle-emissive-strength": 1,
-        "circle-radius": scaleByCustomers(POINT_RADIUS_MIN, POINT_RADIUS_MAX),
-        "circle-opacity": 0.95,
-        "circle-stroke-width": 1.5,
-        "circle-stroke-color": "rgba(0, 0, 0, 0.7)",
-        "circle-color": STATUS_COLOR_EXPRESSION
+        "circle-radius": pointRadius,
+        "circle-opacity": 0.96,
+        "circle-stroke-width": 1,
+        "circle-stroke-color": "rgba(4, 7, 12, 0.88)",
+        "circle-color": STATUS_COLOR_EXPRESSION,
+        "circle-radius-transition": { duration: 180 }
     }
 } satisfies LayerProps;
 
@@ -115,7 +155,6 @@ export const arrivalLayer = {
         "circle-opacity": 0,
         "circle-stroke-width": 2,
         "circle-stroke-opacity": 0.9,
-
         "circle-stroke-color": STATUS_COLOR_EXPRESSION
     }
 } satisfies LayerProps;
