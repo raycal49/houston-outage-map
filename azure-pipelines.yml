@@ -40,6 +40,7 @@ steps:
   workingDirectory: '$(clientApp)'
   displayName: 'npm lint'
 
+
 - script: npm run build
   workingDirectory: '$(clientApp)'
   displayName: 'npm build'
@@ -67,13 +68,13 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '$(serverProject)'
-    arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/app'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/app'
     zipAfterPublish: true
 
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure App Service'
   inputs:
-    azureSubscription: 'YOUR-AZURE-SERVICE-CONNECTION'
+    azureSubscription: 'azure-outagemap'
     appType: 'webAppLinux'
-    appName: 'YOUR-APP-SERVICE-NAME'
+    appName: 'outagemap-houston'
     package: '$(Build.ArtifactStagingDirectory)/app/*.zip'
