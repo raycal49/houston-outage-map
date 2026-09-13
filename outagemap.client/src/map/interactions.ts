@@ -6,6 +6,6 @@ export function zoomToCluster(map: MapRef, clusterId: number, center: [number, n
 
     source?.getClusterExpansionZoom(clusterId, (error, zoom) => {
         if (error || zoom == null) return;
-        map.easeTo({ center, zoom, duration: 700 });
+        map.easeTo({ center, zoom: zoom + 0.01, duration: 700 });
     });
 }
