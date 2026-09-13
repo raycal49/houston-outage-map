@@ -40,14 +40,6 @@ steps:
   workingDirectory: '$(clientApp)'
   displayName: 'npm lint'
 
-
-- script: npm run build
-  workingDirectory: '$(clientApp)'
-  displayName: 'npm build'
-  env:
-    VITE_MAPBOX_TOKEN: $(VITE_MAPBOX_TOKEN)
-    VITE_DEMO_MODE: 'true'
-
 - task: DotNetCoreCLI@2
   displayName: 'Build'
   inputs:
@@ -70,6 +62,9 @@ steps:
     projects: '$(serverProject)'
     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/app'
     zipAfterPublish: true
+  env:
+    VITE_MAPBOX_TOKEN: $(VITE_MAPBOX_TOKEN)
+    VITE_DEMO_MODE: 'true'
 
 - task: AzureWebApp@1
   displayName: 'Deploy to Azure App Service'
