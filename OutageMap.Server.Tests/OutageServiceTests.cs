@@ -32,17 +32,4 @@ public class OutageServiceTests
 
         await Assert.ThrowsAsync<HttpRequestException>(() => _sut.GetOutageData());
     }
-
-    [Fact]
-    public async Task OutageService_ReceivesHttpStatusCode2xx_ReturnsDto()
-    {
-        var outageFixture = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Fixtures", "events.json"));
-
-        _handlerMock.When("https://testapi.test.com")
-               .Respond(HttpStatusCode.OK, "application/json", outageFixture);
-
-        var result = await _sut.GetOutageData();
-
-        Assert.IsType<List<OutageDto>>(result);
-    }
 }

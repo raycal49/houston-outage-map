@@ -1,0 +1,337 @@
+[
+  {
+    "latitude": 29.7604,
+    "longitude": -95.3698,
+    "id": 1001,
+    "startTime": 1789092000000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789102800000,
+    "numPeople": 50,
+    "status": "Pending Assessment",
+    "identifier": "1001",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "CENTRAL"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77002"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.742,
+    "longitude": -95.3852,
+    "id": 1002,
+    "startTime": 1789091100000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789101000000,
+    "numPeople": 40,
+    "status": "Crew Assessing",
+    "identifier": "1002",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "CENTRAL"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77004"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.789,
+    "longitude": -95.4015,
+    "id": 1003,
+    "startTime": 1789090200000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789104600000,
+    "numPeople": 30,
+    "status": "Planned Outage",
+    "cause": "Planned Outage",
+    "identifier": "1003",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "SPRING BRANCH"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77008"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.7265,
+    "longitude": -95.344,
+    "id": 1004,
+    "startTime": 1789089300000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789101900000,
+    "numPeople": 20,
+    "status": "Pending Assessment",
+    "identifier": "1004",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "HARRISBURG"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77023"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.8128,
+    "longitude": -95.361,
+    "id": 1005,
+    "startTime": 1789088400000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789105500000,
+    "numPeople": 10,
+    "status": "Crew Assessing",
+    "identifier": "1005",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "GREENSPOINT"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77009"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.7164,
+    "longitude": -95.4167,
+    "id": 1006,
+    "startTime": 1789087500000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789103700000,
+    "numPeople": 5,
+    "status": "Planned Outage",
+    "cause": "Planned Outage",
+    "identifier": "1006",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "SOUTH HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77005"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.7756,
+    "longitude": -95.2904,
+    "id": 1007,
+    "startTime": 1789086600000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789106400000,
+    "numPeople": 18,
+    "status": "Further Assessment Needed",
+    "identifier": "1007",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "HARRISBURG"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77020"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.6908,
+    "longitude": -95.5155,
+    "id": 1008,
+    "startTime": 1789085700000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789100100000,
+    "numPeople": 24,
+    "status": "Pending Assessment",
+    "identifier": "1008",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "SUGAR LAND"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77074"
+        ]
+      }
+    ]
+  },
+  {
+    "latitude": 29.8273,
+    "longitude": -95.474,
+    "id": 1009,
+    "startTime": 1789084800000,
+    "lastUpdatedTime": 1789093800000,
+    "etrTime": 1789107300000,
+    "numPeople": 12,
+    "status": "Crew Assessing",
+    "identifier": "1009",
+    "additionalProperties": [
+      {
+        "property": "AREA_CITY",
+        "value": [
+          "HOUSTON"
+        ]
+      },
+      {
+        "property": "AREA_COUNTY",
+        "value": [
+          "HARRIS"
+        ]
+      },
+      {
+        "property": "AREA_SERVICE",
+        "value": [
+          "SPRING BRANCH"
+        ]
+      },
+      {
+        "property": "AREA_ZIP",
+        "value": [
+          "77018"
+        ]
+      }
+    ]
+  }
+]

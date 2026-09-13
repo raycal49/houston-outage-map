@@ -1,3 +1,5 @@
+// outagemap.client/src/lib/outages.ts
+
 import type { Feature, FeatureCollection, Point } from 'geojson';
 
 export type OutageProperties = {
@@ -35,18 +37,18 @@ export function featuresWithNewIds(fc: OutageCollection, previousIds: Set<number
 }
 
 export const STATUS_COLORS: Record<string, string> = {
-    'Pending Assessment': '#f59e0b',
-    'Crew Assessing': '#3b82f6',
-    'Planned Outage': '#ef4444',
-    'Further Assessment Needed': '#22d3ee'
+    'Pending Assessment': '#E69F00',
+    'Crew Assessing': '#56B4E9',
+    'Further Assessment Needed': '#CC79A7',
+    'Planned Outage': '#009E73'
 };
 
-export const UNKNOWN_STATUS_COLOR = '#64748b';
+export const UNKNOWN_STATUS_COLOR = '#94a3b8';
 
 export const STATUS_ORDER = [
     'Pending Assessment',
-    'Further Assessment Needed',
     'Crew Assessing',
+    'Further Assessment Needed',
     'Planned Outage'
 ];
 
@@ -58,7 +60,7 @@ export const UNCLASSIFIED_STATUS = 'Unclassified';
 
 export const TREND_HOURS = 6;
 
-export type StatusCount = { status: string; count: number; color: string };
+export type StatusCount = { status: string; count: number; color: string;};
 export type TrendBucket = { label: string; count: number };
 
 export type OutageSummary = {
@@ -99,7 +101,6 @@ export function summariseOutages(fc: OutageCollection | null, now: number = Date
         }
     }
 
-
     const byStatus: StatusCount[] = STATUS_ORDER.map(status => ({
         status,
         count: counts.get(status) ?? 0,
@@ -108,7 +109,11 @@ export function summariseOutages(fc: OutageCollection | null, now: number = Date
 
     for (const [status, count] of counts) {
         if (!STATUS_ORDER.includes(status))
-            byStatus.push({ status, count, color: UNKNOWN_STATUS_COLOR });
+            byStatus.push({
+                status,
+                count,
+                color: UNKNOWN_STATUS_COLOR
+            });
     }
 
     return { total: features.length, customers, largest, byStatus, trend };

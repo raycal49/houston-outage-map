@@ -12,7 +12,6 @@ import {
     CLUSTER_MIN_POINTS,
     CLUSTER_RADIUS,
     clusterCountLayer,
-    clusterHaloLayer,
     clusterLayer,
     outageHaloLayer,
     outageLayer
@@ -104,7 +103,6 @@ function OutageMap() {
                         >
                             <Layer {...outageHaloLayer} />
                             <Layer {...outageLayer} />
-                            <Layer {...clusterHaloLayer} />
                             <Layer {...clusterLayer} />
                             <Layer {...clusterCountLayer} />
                         </Source>
