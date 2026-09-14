@@ -6,17 +6,24 @@ namespace OutageMap.Server.Demo;
 public class OutageSimulator
 {
     private const int PlannedOutagePercent = 12;
+    private const int InitialOutageCount = 6;
+
+    // 0.01 is roughly aabout half a mile 
+    private const double MinOffsetFromCenter = 0.006;
+    private const double MaxOffsetFromCenter = 0.020;
+    private const double MinSpacingBetweenOutages = 0.010;
+    private const int MaxPlacementAttempts = 20;
 
     private int _pollCount;
 
     private readonly Random _random = new();
-    private readonly List<OutageDto> _outages;
-    private readonly HashSet<(double Latitude, double Longitude)> _usedCoordinates = [];
+    private readonly List<OutageDto> _outages = [];
     private long _nextOutageId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
     public OutageSimulator()
     {
-        _outages = LoadDemoOutages();
+        for (int i = 0; i < InitialOutageCount; i++)
+            _outages.Add(CreateDemoOutage());
     }
 
     public List<OutageDto> GetSimulatedOutages()
@@ -93,31 +100,13 @@ public class OutageSimulator
     {
         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        _outages.RemoveAll(outage =>
-        {
-            if (outage.EtrTime == null || outage.EtrTime > now)
-                return false;
-
-            _usedCoordinates.Remove((outage.Latitude, outage.Longitude));
-
-            return true;
-        });
-    }
-
-    private List<OutageDto> LoadDemoOutages()
-    {
-        var outages = new List<OutageDto>();
-
-        for (int i = 0; i < 6; i++)
-            outages.Add(CreateDemoOutage());
-
-        return outages;
+        _outages.RemoveAll(outage => outage.EtrTime != null && outage.EtrTime <= now);
     }
 
     private OutageDto CreateDemoOutage()
     {
         DemoLocation location = DemoLocations.GetRandom(_random);
-        (double latitude, double longitude) = GetUniqueCoordinate(location);
+        (double latitude, double longitude) = GetSpacedCoordinate(location);
         DateTimeOffset now = DateTimeOffset.UtcNow;
 
         return new OutageDto
@@ -142,24 +131,39 @@ public class OutageSimulator
         };
     }
 
-    private (double Latitude, double Longitude) GetUniqueCoordinate(DemoLocation location)
+    private (double Latitude, double Longitude) GetSpacedCoordinate(DemoLocation location)
     {
-        (double Latitude, double Longitude) coordinate;
+        (double Latitude, double Longitude) coordinate = default;
 
-        do
+        for (int attempt = 0; attempt < MaxPlacementAttempts; attempt++)
         {
             coordinate = (
                 location.Latitude + GetCoordinateOffset(),
                 location.Longitude + GetCoordinateOffset());
+
+            if (!IsTooCloseToExistingOutage(coordinate))
+                break;
         }
-        while (!_usedCoordinates.Add(coordinate));
 
         return coordinate;
     }
 
+    private bool IsTooCloseToExistingOutage((double Latitude, double Longitude) coordinate)
+    {
+        return _outages.Any(outage =>
+        {
+            double latitudeDelta = outage.Latitude - coordinate.Latitude;
+            double longitudeDelta = outage.Longitude - coordinate.Longitude;
+            double squaredDistance = (latitudeDelta * latitudeDelta) + (longitudeDelta * longitudeDelta);
+
+            return squaredDistance < MinSpacingBetweenOutages * MinSpacingBetweenOutages;
+        });
+    }
+
     private double GetCoordinateOffset()
     {
-        double offset = (_random.NextDouble() * 0.004) + 0.001;
+        double range = MaxOffsetFromCenter - MinOffsetFromCenter;
+        double offset = (_random.NextDouble() * range) + MinOffsetFromCenter;
 
         return _random.Next(2) == 0 ? -offset : offset;
     }
