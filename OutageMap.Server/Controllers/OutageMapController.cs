@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetTopologySuite.Features;
-using OutageMap.Server.Infrastructure.Http;
-using OutageMap.Server.Services;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace OutageMap.Server.Controllers;
 
@@ -16,6 +14,7 @@ public class OutageMapController : ControllerBase
         _outageReader = outageReader;
     }
 
+    [EnableRateLimiting("GetOutageData")]
     [HttpGet("OutageData")]
     public async Task<ActionResult> GetOutageData(CancellationToken cancellationToken)
     {

@@ -1,13 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.IO.Converters;
+using OutageMap.Server.Demo;
 using OutageMap.Server.Hubs;
 using OutageMap.Server.Infrastructure.Http;
 using OutageMap.Server.Models;
 using OutageMap.Server.Services;
 using Services.BackgroundServices;
 using System.Text.Json.Serialization;
-using OutageMap.Server.Demo;
+using System.Threading.RateLimiting;
 
 var opts = new WebApplicationOptions
 {
@@ -70,12 +72,33 @@ else
     builder.Services.AddSingleton<IOutageSource, DemoSource>();
 }
 
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddPolicy("GetOutageData", httpContext =>
+    {
+        var key = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: key,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+            });
+    });
+});
+
 builder.Services.AddHostedService<OutagePoller>();
 builder.Services.AddTransient<OutagePollOperation>();
 builder.Services.AddSignalR();
 builder.Services.AddScoped<OutageSyncService>();
 builder.Services.AddScoped<IOutageReader, OutageReader>();
 builder.Services.AddSingleton<OutageSimulator>();
+
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -93,10 +116,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRateLimiter();
+
 app.UseExceptionHandler();
 app.MapControllers();
 app.MapHub<OutageHub>("/outageHub");
 
 app.MapFallbackToFile("/index.html");
+
+app.MapHealthChecks("/healthz");
 
 app.Run();
