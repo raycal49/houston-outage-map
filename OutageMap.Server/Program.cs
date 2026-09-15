@@ -85,8 +85,8 @@ builder.Services.AddRateLimiter(options =>
             partitionKey: key,
             factory: _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 5,
-                Window = TimeSpan.FromMinutes(1),
+                PermitLimit = 50,
+                Window = TimeSpan.FromMinutes(3),
             });
     });
 });
