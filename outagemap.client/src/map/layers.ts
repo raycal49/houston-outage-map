@@ -1,5 +1,3 @@
-// outagemap.client/src/map/layers.ts
-
 import type { LayerProps } from 'react-map-gl/mapbox';
 import type { ExpressionSpecification } from 'mapbox-gl';
 import { STATUS_COLORS, UNKNOWN_STATUS_COLOR } from '@/lib/outages';
@@ -9,7 +7,7 @@ export const ARRIVAL_RADIUS_TO = 40;
 
 export const CLUSTER_MAX_ZOOM = 11;
 export const CLUSTER_RADIUS = 44;
-export const CLUSTER_MIN_POINTS = 2;
+export const CLUSTER_MIN_POINTS = 3;
 
 const SIZE_FACTOR = 2.15;
 
@@ -119,8 +117,10 @@ export const outageLayer = {
         "circle-emissive-strength": 1,
         "circle-radius": pointRadius,
         "circle-opacity": 0.96,
-        "circle-stroke-width": 1,
-        "circle-stroke-color": "rgba(4, 7, 12, 0.88)",
+
+        "circle-stroke-width": 3,
+        "circle-stroke-color": "#253145",
+
         "circle-color": STATUS_COLOR_EXPRESSION,
         "circle-radius-transition": { duration: 180 }
     }

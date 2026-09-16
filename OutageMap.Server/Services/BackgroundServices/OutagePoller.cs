@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using OutageMap.Server.Hubs;
 using OutageMap.Server.Infrastructure.Http;
-using OutageMap.Server.Services;
+using OutageMap.Server.Startup;
 
-namespace Services.BackgroundServices;
+namespace OutageMap.Server.Services.BackgroundServices;
 
 public class OutagePoller : BackgroundService
 {
@@ -29,15 +30,22 @@ public class OutagePoller : BackgroundService
 
         _logger.LogInformation("Starting outage polling");
 
-        await PollAsync(++timesPolled, stoppingToken);
+        using IServiceScope scope = _serviceProvider.CreateScope();
+
+        IOutputCacheStore outputCache =
+            scope.ServiceProvider
+                .GetRequiredService<IOutputCacheStore>();
+
+
+        await PollAsync(++timesPolled, stoppingToken, outputCache);
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            await PollAsync(++timesPolled, stoppingToken);
+            await PollAsync(++timesPolled, stoppingToken, outputCache);
         }
     }
 
-    private async Task PollAsync(int timesPolled, CancellationToken stoppingToken)
+    private async Task PollAsync(int timesPolled, CancellationToken stoppingToken, IOutputCacheStore cache)
     {
         try
         {
@@ -63,7 +71,10 @@ public class OutagePoller : BackgroundService
                 result.Deactivated);
 
             if (result.HasChanges)
+            {
+                await cache.EvictByTagAsync(OutagePolicies.OutagesTag, stoppingToken);
                 await _hub.Clients.All.SendAsync("OutagesChanged", cancellationToken: stoppingToken);
+            }
         }
         catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
         {
