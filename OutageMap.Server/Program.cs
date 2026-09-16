@@ -100,6 +100,20 @@ builder.Services.AddSingleton<OutageSimulator>();
 
 builder.Services.AddHealthChecks();
 
+var feedOptions = builder.Configuration
+    .GetSection(OutageFeedOptions.SectionName)
+    .Get<OutageFeedOptions>();
+
+var cacheTTL = feedOptions!.PollInterval;
+
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("outages", policy => policy
+        .Expire(cacheTTL)
+        .Tag("outages")
+        .SetVaryByQuery([]));
+});
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
@@ -125,5 +139,6 @@ app.MapHub<OutageHub>("/outageHub");
 app.MapFallbackToFile("/index.html");
 
 app.MapHealthChecks("/healthz");
+app.UseOutputCache();
 
 app.Run();

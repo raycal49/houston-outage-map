@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace OutageMap.Server.Controllers;
@@ -16,6 +17,7 @@ public class OutageMapController : ControllerBase
 
     [EnableRateLimiting("GetOutageData")]
     [HttpGet("OutageData")]
+    [OutputCache(PolicyName = "outages", Tags = new[] { "outages" })]
     public async Task<ActionResult> GetOutageData(CancellationToken cancellationToken)
     {
         var outages = await _outageReader.GetActiveOutages(cancellationToken);
