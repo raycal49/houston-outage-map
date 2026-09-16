@@ -1,144 +1,41 @@
-﻿using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using NetTopologySuite.IO.Converters;
-using OutageMap.Server.Demo;
-using OutageMap.Server.Hubs;
-using OutageMap.Server.Infrastructure.Http;
-using OutageMap.Server.Models;
-using OutageMap.Server.Services;
-using Services.BackgroundServices;
-using System.Text.Json.Serialization;
-using System.Threading.RateLimiting;
+﻿using OutageMap.Server.Hubs;
+using OutageMap.Server.Startup;
 
-var opts = new WebApplicationOptions
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     Args = args,
     ContentRootPath = AppContext.BaseDirectory,
     WebRootPath = "wwwroot"
-};
-var builder = WebApplication.CreateBuilder(opts);
-
-builder.Services.AddControllers().AddJsonOptions(o =>
-{
-    o.JsonSerializerOptions.Converters.Add(new GeoJsonConverterFactory());
-    o.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
-    o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-});
-builder.Services.AddProblemDetails();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.CustomSchemaIds(type => type.FullName!
-        .Replace("+", ".")
-        .Replace("`", "_"));
 });
 
-var connString = builder.Configuration.GetConnectionString("DefaultConnection")
-                 ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not configured.");
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(connString, o =>
-    {
-        o.UseNetTopologySuite();
-        o.EnableRetryOnFailure();
-    });
-
-    if (builder.Environment.IsDevelopment())
-    {
-        options.EnableDetailedErrors();
-        options.EnableSensitiveDataLogging();
-    }
-});
-
+var feed = builder.Configuration.GetOutageFeed();
 
 builder.Services
-    .AddOptions<OutageFeedOptions>()
-    .Bind(builder.Configuration.GetSection(OutageFeedOptions.SectionName))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-if (string.Equals(builder.Configuration["OutageFeed:Source"], "Live", StringComparison.OrdinalIgnoreCase))
-{
-    builder.Services.AddHttpClient<IOutageSource, PollOutageSource>((provider, client) =>
-    {
-        var options = provider.GetRequiredService<IOptions<OutageFeedOptions>>().Value;
-        client.BaseAddress = options.Url;
-    });
-}
-else
-{
-    builder.Services.AddSingleton<IOutageSource, DemoSource>();
-}
-
-
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-    options.AddPolicy("GetOutageData", httpContext =>
-    {
-        var key = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-
-        return RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: key,
-            factory: _ => new FixedWindowRateLimiterOptions
-            {
-                PermitLimit = 50,
-                Window = TimeSpan.FromMinutes(3),
-            });
-    });
-});
-
-builder.Services.AddHostedService<OutagePoller>();
-builder.Services.AddTransient<OutagePollOperation>();
-builder.Services.AddSignalR();
-builder.Services.AddScoped<OutageSyncService>();
-builder.Services.AddScoped<IOutageReader, OutageReader>();
-builder.Services.AddSingleton<OutageSimulator>();
+    .AddOutageApi()
+    .AddOutagePersistence(builder.Configuration, builder.Environment)
+    .AddOutageFeed(builder.Configuration, feed)
+    .AddOutageThrottling(feed.PollInterval)
+    .AddStaticAssetCaching();
 
 builder.Services.AddHealthChecks();
 
-var feedOptions = builder.Configuration
-    .GetSection(OutageFeedOptions.SectionName)
-    .Get<OutageFeedOptions>();
-
-var cacheTTL = feedOptions!.PollInterval;
-
-builder.Services.AddOutputCache(options =>
-{
-    options.AddPolicy("outages", policy => policy
-        .Expire(cacheTTL)
-        .Tag("outages")
-        .SetVaryByQuery([]));
-});
-
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseSecurityHeaders();
+app.UseHttpsRedirection();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.DisplayRequestDuration();
-    });
-}
-
-app.UseHttpsRedirection();
+app.UseSwaggerInDevelopment();
 
 app.UseRateLimiter();
+app.UseOutputCache();
 
-app.UseExceptionHandler();
 app.MapControllers();
 app.MapHub<OutageHub>("/outageHub");
-
-app.MapFallbackToFile("/index.html");
-
 app.MapHealthChecks("/healthz");
-app.UseOutputCache();
+app.MapFallbackToFile("/index.html");
 
 app.Run();

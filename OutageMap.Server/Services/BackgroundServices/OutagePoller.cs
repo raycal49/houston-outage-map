@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 using OutageMap.Server.Hubs;
 using OutageMap.Server.Infrastructure.Http;
-using OutageMap.Server.Services;
+using OutageMap.Server.Startup;
 
-namespace Services.BackgroundServices;
+namespace OutageMap.Server.Services.BackgroundServices;
 
 public class OutagePoller : BackgroundService
 {
@@ -72,7 +72,7 @@ public class OutagePoller : BackgroundService
 
             if (result.HasChanges)
             {
-                await cache.EvictByTagAsync("outages", stoppingToken);
+                await cache.EvictByTagAsync(OutagePolicies.OutagesTag, stoppingToken);
                 await _hub.Clients.All.SendAsync("OutagesChanged", cancellationToken: stoppingToken);
             }
         }
