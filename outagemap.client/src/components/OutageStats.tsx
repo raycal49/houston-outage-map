@@ -1,33 +1,13 @@
-import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts';
-import { PLANNED_STATUS, type OutageSummary, type TrendBucket } from '@/lib/outages';
+import { PLANNED_STATUS, type OutageSummary } from '@/lib/outages';
 
 type OutageStatsProps = {
     summary: OutageSummary;
 };
 
-const TREND_INK = '#e2e8f0';
-
 const CAP = 'font-ui-mono text-2xs tracking-wider uppercase text-white/60';
 
-function TrendTooltip({ active, payload }: {
-    active?: boolean;
-    payload?: { payload: TrendBucket }[];
-}) {
-    if (!active || !payload?.length) return null;
-
-    const bucket = payload[0].payload;
-
-    return (
-        <div className="rounded-sm border border-ui-border bg-ui-surface-solid px-2 py-1
-                        font-ui-mono text-2xs whitespace-nowrap text-ui-text">
-            {bucket.count} started · {bucket.label === 'now' ? 'this hour' : bucket.label}
-        </div>
-    );
-}
-
 export default function OutageStats({ summary }: OutageStatsProps) {
-    const { total, customers, largest, byStatus, trend } = summary;
-    const hasTrend = trend.some(bucket => bucket.count > 0);
+    const { total, customers, largest, byStatus } = summary;
 
     const tiles: { label: string; value: number }[] = [
         { label: 'Outages', value: total },
@@ -79,36 +59,6 @@ export default function OutageStats({ summary }: OutageStatsProps) {
                     </li>
                 ))}
             </ul>
-
-            {/* {hasTrend && (
-                <div className="flex flex-col gap-1.5 max-sm:hidden">
-                    <span className={CAP}>Started, last 6h</span>
-                    <ResponsiveContainer width="100%" height={40}>
-                        <AreaChart data={trend} margin={{ top: 2, right: 2, bottom: 0, left: 2 }}>
-                            <defs>
-                                <linearGradient id="stats-trend-fill" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor={TREND_INK} stopOpacity={0.34} />
-                                    <stop offset="100%" stopColor={TREND_INK} stopOpacity={0} />
-                                </linearGradient>
-                            </defs>
-                            <Tooltip
-                                content={<TrendTooltip />}
-                                cursor={{ stroke: 'rgba(255,255,255,.28)', strokeWidth: 1 }}
-                            />
-                            <Area
-                                type="monotone"
-                                dataKey="count"
-                                stroke={TREND_INK}
-                                strokeWidth={2}
-                                fill="url(#stats-trend-fill)"
-                                dot={false}
-                                activeDot={{ r: 3, fill: TREND_INK, stroke: '#0d0c12', strokeWidth: 2 }}
-                                isAnimationActive={false}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </div>
-            )} */}
 
             <footer className={`flex items-center justify-between gap-2 border-t border-white/10 pt-2.5 ${CAP} max-sm:hidden`}>
                 <span>Largest</span>

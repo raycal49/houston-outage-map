@@ -69,30 +69,21 @@ export function statusColor(status: string | undefined): string {
 
 export const UNCLASSIFIED_STATUS = 'Unclassified';
 
-export const TREND_HOURS = 6;
-
 export type StatusCount = { status: string; count: number; color: string;};
-export type TrendBucket = { label: string; count: number };
 
 export type OutageSummary = {
     total: number;
     customers: number;
     largest: number;
     byStatus: StatusCount[];
-    trend: TrendBucket[];
 };
 
-export function summariseOutages(fc: OutageCollection | null, now: number = Date.now()): OutageSummary {
+export function summariseOutages(fc: OutageCollection | null): OutageSummary {
     const counts = new Map<string, number>();
     const features = fc?.features ?? [];
 
     let customers = 0;
     let largest = 0;
-
-    const trend: TrendBucket[] = [];
-    for (let hoursBack = TREND_HOURS - 1; hoursBack >= 0; hoursBack--) {
-        trend.push({ label: hoursBack === 0 ? 'now' : `-${hoursBack}h`, count: 0 });
-    }
 
     for (const feature of features) {
         const properties = feature.properties ?? {};
@@ -103,13 +94,6 @@ export function summariseOutages(fc: OutageCollection | null, now: number = Date
         const affected = typeof properties.numPeople === 'number' ? properties.numPeople : 0;
         customers += affected;
         if (affected > largest) largest = affected;
-
-        if (typeof properties.startTime === 'number') {
-            const hoursAgo = (now - properties.startTime) / 3_600_000;
-
-            if (hoursAgo >= 0 && hoursAgo < TREND_HOURS)
-                trend[TREND_HOURS - 1 - Math.floor(hoursAgo)].count += 1;
-        }
     }
 
     const byStatus: StatusCount[] = STATUS_ORDER.map(status => ({
@@ -127,5 +111,5 @@ export function summariseOutages(fc: OutageCollection | null, now: number = Date
             });
     }
 
-    return { total: features.length, customers, largest, byStatus, trend };
+    return { total: features.length, customers, largest, byStatus };
 }

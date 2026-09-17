@@ -40,7 +40,7 @@ function OutageMap() {
 
     useArrivalPulse(mapRef, arrivals);
 
-    const summary = useMemo(() => summariseOutages(outages, lastUpdatedAt ?? Date.now()), [outages, lastUpdatedAt]);
+    const summary = useMemo(() => summariseOutages(outages), [outages]);
 
     const handleMapLoad = () => {
         const map = mapRef.current?.getMap();
