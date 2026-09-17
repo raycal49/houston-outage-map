@@ -1,6 +1,5 @@
 import type { ExpressionSpecification, Map as MapboxMap } from 'mapbox-gl';
 import lightningSlashSvg from '@phosphor-icons/core/assets/fill/lightning-slash-fill.svg?raw';
-import calendarDotsSvg from '@phosphor-icons/core/assets/fill/calendar-dots-fill.svg?raw';
 import { MAX_MARKER_RADIUS, PLANNED_STATUS, STATUS_COLORS, UNKNOWN_STATUS_COLOR } from '@/lib/outages';
 
 const PIXEL_RATIO = 2;
@@ -80,7 +79,7 @@ function drawMarker({ color, planned }: MarkerImage): ImageData | null {
     ctx.translate(center - symbol / 2, center - symbol / 2);
     ctx.scale(symbol / ICON_GRID, symbol / ICON_GRID);
     ctx.fillStyle = SYMBOL_COLOR;
-    ctx.fill(symbolFor(planned ? calendarDotsSvg : lightningSlashSvg));
+    ctx.fill(symbolFor(lightningSlashSvg));
 
     return ctx.getImageData(0, 0, size, size);
 }

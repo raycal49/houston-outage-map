@@ -14,5 +14,12 @@ public sealed class OutageEntityConfiguration: IEntityTypeConfiguration<OutageEn
 
         builder.Property(x => x.Location)
             .HasColumnType("geography");
+
+        builder.ToTable("Outages", t => t.IsTemporal(h =>
+        {
+            h.HasPeriodStart("ValidFrom");
+            h.HasPeriodEnd("ValidTo");
+            h.UseHistoryTable("OutagesHistory");
+        }));
     }
 }
