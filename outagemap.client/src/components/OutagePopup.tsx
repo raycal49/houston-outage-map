@@ -1,5 +1,13 @@
+import { CalendarDotsIcon, HardHatIcon, HourglassMediumIcon, QuestionMarkIcon, type Icon, type IconWeight } from '@phosphor-icons/react';
 import { formatOutageAge, formatRelativeEtr, toTitleCase } from '@/lib/format';
 import { statusColor, UNCLASSIFIED_STATUS, type OutageFeature } from '@/lib/outages';
+
+const STATUS_ICONS: Record<string, { icon: Icon; weight: IconWeight }> = {
+    'Pending Assessment': { icon: HourglassMediumIcon, weight: 'fill' },
+    'Crew Assessing': { icon: HardHatIcon, weight: 'fill' },
+    'Further Assessment Needed': { icon: QuestionMarkIcon, weight: 'bold' },
+    'Planned Outage': { icon: CalendarDotsIcon, weight: 'fill' }
+};
 
 type OutagePopupProps = {
     outage: OutageFeature;
@@ -11,6 +19,7 @@ export default function OutagePopup({ outage }: OutagePopupProps) {
     const properties = outage.properties ?? {};
     const status = properties.status ?? UNCLASSIFIED_STATUS;
     const color = statusColor(properties.status);
+    const statusIcon = properties.status ? STATUS_ICONS[properties.status] : undefined;
 
     const rows: Row[] = [];
 
@@ -43,7 +52,11 @@ export default function OutagePopup({ outage }: OutagePopupProps) {
                                font-ui-mono text-2xs leading-tight tracking-wider whitespace-nowrap uppercase"
                     style={{ color, borderColor: `${color}66`, background: `${color}1f` }}
                 >
-                    <span className="size-1.5 shrink-0 rounded-full" style={{ background: color }} />
+                    {statusIcon ? (
+                        <statusIcon.icon size={13} weight={statusIcon.weight} aria-hidden="true" className="shrink-0" />
+                    ) : (
+                        <span className="size-1.5 shrink-0 rounded-full" style={{ background: color }} />
+                    )}
                     {status}
                 </span>
             </div>

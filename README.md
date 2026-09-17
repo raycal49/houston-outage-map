@@ -40,7 +40,7 @@ Because it's a third party's undocumented endpoint, the project is deliberately 
 - Outages are soft-deactivated with a `ResolvedAt` timestamp instead of deleted, so the table keeps a record of what happened rather than only a live view.
 - Locations are stored as a SQL Server `geography` column via NetTopologySuite and served to the browser as GeoJSON.
 - Points cluster by zoom level, size by customers affected, and color by outage status. New outages pulse once when they arrive.
-- A summary panel shows total outages, customers affected, a status breakdown, and a 6-hour trend of outages started.
+- A summary panel shows total outages, customers affected, a status breakdown, and the largest single outage.
 - A live/reconnecting/offline pill shows feed health and how long it's been since the last update.
 
 ## Architecture

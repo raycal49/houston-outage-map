@@ -14,9 +14,11 @@ import {
     clusterCountLayer,
     clusterLayer,
     outageHaloLayer,
+    outageLargeRingLayer,
     outageLayer
 } from './layers';
 import { applyBasemapConfig } from './basemap';
+import { addMarkerImage, addMarkerImages } from './markerImages';
 import { zoomToCluster } from './interactions';
 import { useArrivalPulse } from './useArrivalPulse';
 import '@/mapbox-overrides.css';
@@ -38,11 +40,15 @@ function OutageMap() {
 
     useArrivalPulse(mapRef, arrivals);
 
-    const summary = useMemo(() => summariseOutages(outages, lastUpdatedAt ?? Date.now()), [outages, lastUpdatedAt]);
+    const summary = useMemo(() => summariseOutages(outages), [outages]);
 
     const handleMapLoad = () => {
         const map = mapRef.current?.getMap();
-        if (map) applyBasemapConfig(map);
+        if (!map) return;
+
+        applyBasemapConfig(map);
+        addMarkerImages(map);
+        map.on("styleimagemissing", e => addMarkerImage(map, e.id));
     };
 
     const handleMapClick = (e: MapMouseEvent) => {
@@ -102,6 +108,7 @@ function OutageMap() {
                             clusterProperties={{ customers: ["+", ["coalesce", ["get", "numPeople"], 0]] }}
                         >
                             <Layer {...outageHaloLayer} />
+                            <Layer {...outageLargeRingLayer} />
                             <Layer {...outageLayer} />
                             <Layer {...clusterLayer} />
                             <Layer {...clusterCountLayer} />

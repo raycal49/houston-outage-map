@@ -1,8 +1,9 @@
 import type { LayerProps } from 'react-map-gl/mapbox';
 import type { ExpressionSpecification } from 'mapbox-gl';
-import { STATUS_COLORS, UNKNOWN_STATUS_COLOR } from '@/lib/outages';
+import { LARGE_OUTAGE_CUSTOMERS, MAX_MARKER_RADIUS, SIZE_STEPS, STATUS_COLORS, UNKNOWN_STATUS_COLOR } from '@/lib/outages';
+import { STATUS_IMAGE_EXPRESSION } from './markerImages';
 
-export const ARRIVAL_RADIUS_FROM = 6;
+export const ARRIVAL_RADIUS_FROM = SIZE_STEPS[0].radius;
 export const ARRIVAL_RADIUS_TO = 40;
 
 export const CLUSTER_MAX_ZOOM = 11;
@@ -11,12 +12,11 @@ export const CLUSTER_MIN_POINTS = 3;
 
 const SIZE_FACTOR = 2.15;
 
-const SMALLEST_POINT_PX = 5;
-const LARGEST_POINT_PX = 18;
 const SMALLEST_CLUSTER_PX = 14;
 const LARGEST_CLUSTER_PX = 30;
 
 const HALO_PADDING_PX = 5;
+const LARGE_RING_PADDING_PX = 6;
 
 const CUSTOMER_STOPS = [1, 5, 10, 25, 50, 100, 250, 500, 1000];
 
@@ -26,14 +26,6 @@ function clamp(value: number, smallest: number, largest: number): number {
 
 function radiusForCustomers(customers: number, smallestPx: number, largestPx: number): number {
     return clamp(SIZE_FACTOR * Math.sqrt(customers), smallestPx, largestPx);
-}
-
-function pointRadiusOf(customers: number): number {
-    return radiusForCustomers(customers, SMALLEST_POINT_PX, LARGEST_POINT_PX);
-}
-
-function haloRadiusOf(customers: number): number {
-    return pointRadiusOf(customers) + HALO_PADDING_PX;
 }
 
 function clusterRadiusOf(customers: number): number {
@@ -54,8 +46,15 @@ function radiusExpression(
     return ["interpolate", ["linear"], customers, ...stopsFrom(radiusOf)] as ExpressionSpecification;
 }
 
-const pointRadius = radiusExpression(pointCustomers, pointRadiusOf);
-const haloRadius = radiusExpression(pointCustomers, haloRadiusOf);
+const pointRadius = [
+    "step",
+    pointCustomers,
+    SIZE_STEPS[0].radius,
+    ...SIZE_STEPS.slice(1).flatMap(step => [step.minCustomers, step.radius])
+] as ExpressionSpecification;
+
+const haloRadius: ExpressionSpecification = ["+", pointRadius, HALO_PADDING_PX];
+const largeRingRadius: ExpressionSpecification = ["+", pointRadius, LARGE_RING_PADDING_PX];
 const clusterRadius = radiusExpression(clusterCustomers, clusterRadiusOf);
 const clusterLabel: ExpressionSpecification = ["get", "point_count_abbreviated"];
 
@@ -109,20 +108,33 @@ export const outageHaloLayer = {
     }
 } satisfies LayerProps;
 
-export const outageLayer = {
-    id: "outage-points",
+export const outageLargeRingLayer = {
+    id: "outage-large-rings",
     type: "circle",
-    filter: ["!", ["has", "point_count"]],
+    filter: ["all", ["!", ["has", "point_count"]], [">=", pointCustomers, LARGE_OUTAGE_CUSTOMERS]],
     paint: {
         "circle-emissive-strength": 1,
-        "circle-radius": pointRadius,
-        "circle-opacity": 0.96,
+        "circle-radius": largeRingRadius,
+        "circle-color": "rgba(0, 0, 0, 0)",
+        "circle-stroke-width": 1.5,
+        "circle-stroke-opacity": 0.7,
+        "circle-stroke-color": STATUS_COLOR_EXPRESSION
+    }
+} satisfies LayerProps;
 
-        "circle-stroke-width": 3,
-        "circle-stroke-color": "#253145",
-
-        "circle-color": STATUS_COLOR_EXPRESSION,
-        "circle-radius-transition": { duration: 180 }
+export const outageLayer = {
+    id: "outage-points",
+    type: "symbol",
+    filter: ["!", ["has", "point_count"]],
+    layout: {
+        "icon-image": STATUS_IMAGE_EXPRESSION,
+        "icon-size": ["/", pointRadius, MAX_MARKER_RADIUS],
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true,
+        "symbol-sort-key": ["-", pointCustomers]
+    },
+    paint: {
+        "icon-emissive-strength": 1
     }
 } satisfies LayerProps;
 
