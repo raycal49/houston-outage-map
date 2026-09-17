@@ -45,6 +45,17 @@ export const STATUS_COLORS: Record<string, string> = {
 
 export const UNKNOWN_STATUS_COLOR = '#94a3b8';
 
+export const PLANNED_STATUS = 'Planned Outage';
+
+export const SIZE_STEPS = [
+    { label: 'Small', minCustomers: 0, radius: 10 },
+    { label: 'Moderate', minCustomers: 11, radius: 14 },
+    { label: 'Large', minCustomers: 101, radius: 19 }
+] as const;
+
+export const MAX_MARKER_RADIUS = SIZE_STEPS[SIZE_STEPS.length - 1].radius;
+export const LARGE_OUTAGE_CUSTOMERS = SIZE_STEPS[SIZE_STEPS.length - 1].minCustomers;
+
 export const STATUS_ORDER = [
     'Pending Assessment',
     'Crew Assessing',

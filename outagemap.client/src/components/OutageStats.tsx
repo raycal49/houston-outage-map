@@ -1,5 +1,5 @@
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from 'recharts';
-import type { OutageSummary, TrendBucket } from '@/lib/outages';
+import { PLANNED_STATUS, type OutageSummary, type TrendBucket } from '@/lib/outages';
 
 type OutageStatsProps = {
     summary: OutageSummary;
@@ -71,7 +71,7 @@ export default function OutageStats({ summary }: OutageStatsProps) {
                     <li key={entry.status} className="flex items-center gap-2.5 text-xs text-white/90">
                         <span
                             aria-hidden="true"
-                            className="size-2 shrink-0 rounded-full"
+                            className={`size-2.5 shrink-0 ${entry.status === PLANNED_STATUS ? 'rounded-[3px]' : 'rounded-full'}`}
                             style={{ background: entry.color }}
                         />
                         <span className="flex-1 truncate">{entry.status}</span>
@@ -80,7 +80,7 @@ export default function OutageStats({ summary }: OutageStatsProps) {
                 ))}
             </ul>
 
-            {hasTrend && (
+            {/* {hasTrend && (
                 <div className="flex flex-col gap-1.5 max-sm:hidden">
                     <span className={CAP}>Started, last 6h</span>
                     <ResponsiveContainer width="100%" height={40}>
@@ -108,7 +108,7 @@ export default function OutageStats({ summary }: OutageStatsProps) {
                         </AreaChart>
                     </ResponsiveContainer>
                 </div>
-            )}
+            )} */}
 
             <footer className={`flex items-center justify-between gap-2 border-t border-white/10 pt-2.5 ${CAP} max-sm:hidden`}>
                 <span>Largest</span>
